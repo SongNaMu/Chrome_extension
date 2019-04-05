@@ -1,0 +1,32 @@
+2019.04.04
+
+2019.04.05
+1. 자바스크립트 코드에서 css속성을 조작하다가 에러가 남
+function createDiv(){
+  chrome.tabs.executeScript({
+    //div객체를 생성후 body에 append
+    code:`
+    var popup = document.createElement("div");
+    popup.setAttribute("id","layer_popup");
+    popup.style.width="100%";
+    popup.style.height="100%";
+    popup.style.top="0px";
+    popup.style.left="0px";
+    popup.style.position="absolute";
+    popup.style.z-index="800";
+    popup.style.backgroundColor="gray";
+    popup.style.opacity="0.5";
+
+    popup.addEventListener("click", function(){
+      document.body.removeChild(popup);
+    });
+
+    document.body.appendChild(popup);`
+
+  });
+}
+
+2. z-index에서 에러가 났다.
+3. 자바스크립트 코드에서 css속성을 작성할때 하이푼을 쓰지말라는 글을 봤다.
+4. zIndex로 고치니까 에러가 없어지고 속성도 잘 적용됬다.
+5. css 명명 규칙중 camel case라는 키워드를 공부해보라는 말을 들었다.
