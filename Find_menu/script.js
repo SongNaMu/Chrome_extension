@@ -1,37 +1,40 @@
-//페이지가 로드될때
+var urlList = "sibal";
 
 window.onload = function(){
+  console.log("1" + urlList);
+  take_session();
+  console.log("3" + urlList);
   var fbt = document.getElementById('fbt');
   var abt = document.getElementById('add');
+  var tbt = document.getElementById('test');
 
   document.createElement('div');
   //Find Menu버튼을 클릭했을때
-  fbt.addEventListener('click', function test(){
-    chrome.tabs.executeScript({
-      //크롬에서 현재 페이지의 url을 가져와
-      code:'document.location.href;'
-    }, function(data){
-      var Curl = data;
-      //현재 페이지가 네이버라면
-      if(Curl == 'https://www.naver.com/'){
-        createDiv("#PM_ID_btnServiceMore");
-        chrome.tabs.remove();
-        self.close();
-      }else{
-        //saveData(data, 132)
-        alert("Can't find menu");
-        //selectId();
-      }
-    });
-  });
-
+  fbt.addEventListener('click', test);
   abt.addEventListener('click', selectId);
+  tbt.addEventListener('click', function(){console.log("4"+urlList)});
+}
 
+function test(){
+  chrome.tabs.executeScript({
+    //크롬에서 현재 페이지의 url을 가져와
+    code:'document.location.href;'
+  }, function(data){
+    var Curl = data;
+    //현재 페이지가 네이버라면
+    if(Curl == 'https://www.naver.com/'){
+      createDiv("#PM_ID_btnServiceMore");
+      chrome.tabs.remove();
+      self.close();
+    }else{
+      alert("Can't find menu");
+    }
+  });
 }
 
 //클릭한 컴포넌트 id알아내기
 // 현재탭의 body에 이벤트리스너 삽입(클릭)
-// 클릭이벤트가 일어나면 IdClass에 클릭된태그 id class 저장
+// 클릭이벤트가 일어나면 sessionStorage에 url, tag id class 저장
 //
 function selectId(){
   chrome.tabs.executeScript({
@@ -45,35 +48,19 @@ function selectId(){
 
       //클릭한 태그에 id or class를
       if(tagId != undefined){
-        alert("#" + tagId);
-        //IdClass = "#" + tagId;
-        //alert("IdClass = " + IdClass);
+        IdClass = "#" + tagId;
+        this.removeEventListener("click", arguments.callee);
       }else if(tagClass != undefined){
-        alert("." + tagClass);
-        //IdClass = "." + tagClass;
+        IdClass = "." + tagClass;
+        this.removeEventListener("click", arguments.callee);
       }else {
         alert("error");
       }
-
-    }, true);
-
+      sessionStorage.setItem("IdOrClass",IdClass);
+      sessionStorage.setItem("url",document.location.href);
+    }, false);
     `
   });
-  //IdClass에 값이 들어 가있는지 확인
-  var checkinterval = setInterval(function(){
-    chrome.tabs.executeScript({
-      code:'IdClass;'
-    }, function (result){
-      if(result != undefined){
-        chrome.storage.sync.set({
-          url:test,
-          id:result
-        });
-        alert("클릭된 tag의 id는" + result + "입니다.");
-        clearInterval(checkinterval);
-      }
-    })
-  }, 100);
 }
 
 //chrome storage에 url과 id 저장
@@ -83,6 +70,21 @@ function saveData(url, id){
     id:id
   });
 }
+
+//페이지가 로드될때 sessionStorage의 url id값을 chromStorage에 저장
+function take_session (){
+  chrome.tabs.executeScript({
+    code:`
+    var data = {
+      url: sessionStorage.url,
+      id: sessionStorage.IdOrClass}; data`
+  }, function(result){
+    saveData(result[0]["url"], result[0]["id"]);
+    urlList = result;
+    console.log(urlList);
+  });
+}
+
 
 //tag의 class나 id를 input하면 표시해준다.
 function createDiv(abt){
@@ -154,7 +156,5 @@ function createDiv(abt){
       }
     }, 300);
     `
-
-
   });
 }
