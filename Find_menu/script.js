@@ -2,6 +2,8 @@
 
 window.onload = function(){
   var fbt = document.getElementById('fbt');
+  var abt = document.getElementById('add');
+
   document.createElement('div');
   //Find Menu버튼을 클릭했을때
   fbt.addEventListener('click', function test(){
@@ -12,41 +14,66 @@ window.onload = function(){
       var Curl = data;
       //현재 페이지가 네이버라면
       if(Curl == 'https://www.naver.com/'){
-        //createDiv("#PM_ID_btnServiceMore");
-        selectId();
+        createDiv("#PM_ID_btnServiceMore");
         chrome.tabs.remove();
-        //self.close();
+        self.close();
       }else{
-        saveData(data, 132)
+        //saveData(data, 132)
         alert("Can't find menu");
-        selectId();
+        //selectId();
       }
     });
   });
 
+  abt.addEventListener('click', selectId);
 
 }
+
 //클릭한 컴포넌트 id알아내기
+// 현재탭의 body에 이벤트리스너 삽입(클릭)
+// 클릭이벤트가 일어나면 IdClass에 클릭된태그 id class 저장
+//
 function selectId(){
   chrome.tabs.executeScript({
     code:`
+    //IdClass 글로벌로 박아놔
+    var IdClass = undefined;
     document.body.addEventListener('click',function(event){
-      alert(event.target.getAttribute('class'));
+      //alert(event.target.getAttribute('class'));
       tagClass = event.target.getAttribute('class');
       tagId = event.target.getAttribute('id');
 
       //클릭한 태그에 id or class를
       if(tagId != undefined){
         alert("#" + tagId);
+        //IdClass = "#" + tagId;
+        //alert("IdClass = " + IdClass);
       }else if(tagClass != undefined){
         alert("." + tagClass);
+        //IdClass = "." + tagClass;
       }else {
         alert("error");
       }
+
     }, true);
 
     `
   });
+  //IdClass에 값이 들어 가있는지 확인
+  var checkinterval = setInterval(function(){
+    chrome.tabs.executeScript({
+      code:'IdClass;'
+    }, function (result){
+      if(result != undefined){
+        chrome.storage.sync.set({
+          url:test,
+          id:result
+        });
+        alert("클릭된 tag의 id는" + result + "입니다.");
+        clearInterval(checkinterval);
+      }
+    })
+  }, 100);
 }
 
 //chrome storage에 url과 id 저장
