@@ -12,7 +12,7 @@ function matching(user){
 
     // id 값이 result인 태그에 결과를 추가한다.
     document.querySelector('#result').innerText = myNum + '/' + bodyNum + ' (' + per + '%)';
-  });
+  }};
 }
 
 //크롬 스토리지에 저장된 값을 가져오세요.

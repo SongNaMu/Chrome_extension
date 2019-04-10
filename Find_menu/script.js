@@ -3,7 +3,7 @@
 window.onload = function(){
   var fbt = document.getElementById('fbt');
   document.createElement('div');
-  //버튼을 클릭했을때
+  //Find Menu버튼을 클릭했을때
   fbt.addEventListener('click', function test(){
     chrome.tabs.executeScript({
       //크롬에서 현재 페이지의 url을 가져와
@@ -12,24 +12,53 @@ window.onload = function(){
       var Curl = data;
       //현재 페이지가 네이버라면
       if(Curl == 'https://www.naver.com/'){
-        createDiv();
-        self.close();
+        //createDiv("#PM_ID_btnServiceMore");
+        selectId();
+        chrome.tabs.remove();
+        //self.close();
       }else{
         saveData(data, 132)
-        alert("no");
+        alert("Can't find menu");
+        selectId();
       }
     });
   });
-}
 
-function saveData(url, id){
-  chrome.storage.sync.set({
-    :"id"
+
+}
+//클릭한 컴포넌트 id알아내기
+function selectId(){
+  chrome.tabs.executeScript({
+    code:`
+    document.body.addEventListener('click',function(event){
+      alert(event.target.getAttribute('class'));
+      tagClass = event.target.getAttribute('class');
+      tagId = event.target.getAttribute('id');
+
+      //클릭한 태그에 id or class를
+      if(tagId != undefined){
+        alert("#" + tagId);
+      }else if(tagClass != undefined){
+        alert("." + tagClass);
+      }else {
+        alert("error");
+      }
+    }, true);
+
+    `
   });
 }
 
+//chrome storage에 url과 id 저장
+function saveData(url, id){
+  chrome.storage.sync.set({
+    url:url,
+    id:id
+  });
+}
 
-function createDiv(){
+//tag의 class나 id를 input하면 표시해준다.
+function createDiv(abt){
   chrome.tabs.executeScript({
     code:`
     var pad = 15;
@@ -45,8 +74,8 @@ function createDiv(){
     popup.style.zIndex="800";
     popup.style.backgroundColor="rgba(0,0,0, 0.6)";
 
-    //타겟(메뉴버튼)을 찾고 그 상대위치를 구하는 법
-    var target = document.querySelector("#PM_ID_btnServiceMore");
+    //타겟(메뉴버튼)을 찾고 그 절대위치를 구하는 법
+    var target = document.querySelector("` + abt + `");
     var clientRect = target.getBoundingClientRect();
     var relativeTop = clientRect.top;
     var relativeLeft = clientRect.left;
