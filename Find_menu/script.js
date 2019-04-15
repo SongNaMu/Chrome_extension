@@ -62,7 +62,13 @@ function selectId(){
     `
   });
 }
-
+function getChromeStorage(){
+  var CSD;
+  chrome.storage.get(function(data){
+    CSD = data;
+  });
+  console.log(CSD);
+}
 //chrome storage에 url과 id 저장
 function saveData(url, id){
   chrome.storage.sync.set({
@@ -79,9 +85,12 @@ function take_session (){
       url: sessionStorage.url,
       id: sessionStorage.IdOrClass}; data`
   }, function(result){
-    saveData(result[0]["url"], result[0]["id"]);
-    urlList = result;
-    console.log(urlList);
+    if(result[0]["url"] != undefined && result[0]["url"] != undefined){
+      saveData(result[0]["url"], result[0]["id"]);
+      urlList = result;
+      console.log(urlList);
+    }
+
   });
 }
 
