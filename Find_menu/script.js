@@ -48,6 +48,7 @@ function check_list(){
       idx = chrome_storage.data.url.indexOf(Curl[0]);
       console.log("idx = " + idx);
       console.log("id = " + chrome_storage.data.IdClass[idx]);
+      console.log()
       createDiv(chrome_storage.data.IdClass[idx]);
     //  createDiv(".an_mtxt");
       //chrome.tabs.remove();
@@ -73,14 +74,14 @@ function selectId(){
       tagId = event.target.getAttribute('id');
 
       //클릭한 태그에 id or class를
-      if(tagId != undefined){
-        IdClass = "#" + tagId;
-        this.removeEventListener("click",arguments.callee);
-        alert(this);
-      }else if(tagClass != undefined){
+      if(tagClass != undefined){
         IdClass = "." + tagClass;
         alert(this);
         this.removeEventListener("click",arguments.callee, true);
+      }else if(tagId != undefined){
+        IdClass = "#" + tagId;
+        this.removeEventListener("click",arguments.callee);
+        alert(this);
       }else {
         alert("error");
         this.removeEventListener("click", arguments.callee, true);
@@ -128,6 +129,7 @@ function storagePush(Curl, IdClass){
 function createDiv(abt){
   chrome.tabs.executeScript({
     code:`
+    console.log("`+abt+`")
     if(document.getElementById("layer_popup") == undefined){
       var pad = 15;
 
